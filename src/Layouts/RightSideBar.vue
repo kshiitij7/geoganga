@@ -63,7 +63,7 @@
                         </v-card-title>
                         <v-divider :thickness="2" color="black"></v-divider>
                         <v-card-text>
-                            <v-text-field v-model="searchQuery" prepend-inner-icon="mdi-magnify" @keydown.enter="onSearchInput" style="margin-top: 20px; margin-bottom: 30px;" placeholder="Type to Search ..." outlined></v-text-field>
+                            <v-text-field v-model="searchQuery" clearable prepend-inner-icon="mdi-magnify" @keydown.enter="onSearchInput" style="margin-top: 20px; margin-bottom: 30px;" placeholder="Type to Search ..." outlined></v-text-field>
                         </v-card-text>
                     </v-card>
                     <v-divider :thickness="3"></v-divider>
@@ -181,8 +181,8 @@
                 eventBus.emit('clear-measurements');
             },
             toggleCropTool() {
-                this.cropToolActive = !this.cropToolActive; // Toggle the crop tool state
-                eventBus.emit('cropToolToggled', this.cropToolActive); // Emit event when crop tool is toggled
+                this.cropToolActive = !this.cropToolActive; 
+                eventBus.emit('cropToolToggled', this.cropToolActive); 
             },
     
         },
