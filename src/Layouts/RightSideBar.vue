@@ -1,14 +1,14 @@
 <template>
     <div class="RightSideBar">
         <v-main style="--v-layout-top: 0px;">
-            <v-navigation-drawer rail app location="right" color="black">
+            <v-navigation-drawer rail app location="right" color="rgb(2, 42, 56)">
                 <v-list>
                     <!-- Search Button -->
                     <v-list-item @click="openRightDrawer('search')" class="cursor-pointer">
                         <v-list-item-title>
                             <v-tooltip location="right">
                                 <template v-slot:activator="{ props: tooltip }">
-                                    <v-icon v-bind="tooltip">mdi-magnify</v-icon>
+                                    <v-icon style="color: wheat;" v-bind="tooltip">mdi-magnify</v-icon>
                                 </template>
                                 <span>Search</span>
                             </v-tooltip>
@@ -20,7 +20,7 @@
                         <v-list-item-title>
                             <v-tooltip location="right">
                                 <template v-slot:activator="{ props: tooltip }">
-                                    <v-icon v-bind="tooltip">mdi-ruler-square</v-icon>
+                                    <v-icon style="color: wheat;" v-bind="tooltip">mdi-ruler-square</v-icon>
                                 </template>
                                 <span>Measurement Tool</span>
                             </v-tooltip>
@@ -32,7 +32,7 @@
                         <v-list-item-title>
                             <v-tooltip location="right">
                                 <template v-slot:activator="{ props: tooltip }">
-                                    <v-icon v-bind="tooltip">mdi-crop</v-icon>
+                                    <v-icon style="color: wheat;" v-bind="tooltip">mdi-crop</v-icon>
                                 </template>
                                 <span>Crop Tool</span>
                             </v-tooltip>
@@ -44,7 +44,7 @@
                         <v-list-item-title>
                             <v-tooltip location="right">
                                 <template v-slot:activator="{ props: tooltip}">
-                                    <v-icon v-bind="tooltip">mdi-weather-partly-cloudy</v-icon>
+                                    <v-icon style="color: wheat;" v-bind="tooltip">mdi-weather-partly-cloudy</v-icon>
                                 </template>
                                 <span>Weather Analysis</span>
                             </v-tooltip>
@@ -183,8 +183,7 @@
             toggleCropTool() {
                 this.cropToolActive = !this.cropToolActive; 
                 eventBus.emit('cropToolToggled', this.cropToolActive); 
-            },
-    
+            },  
         },
     };
     </script>

@@ -1,16 +1,13 @@
 <template>
 <v-main>
     <div class="image-container">
-        <!-- Display the current image based on the current index -->
-        <v-img :src="images[currentIndex]" class="image" />
+        <v-img :src="images[currentIndex]"/>
 
-        <!-- Arrow buttons positioned over the image -->
         <v-btn @click="prevImage" icon class="left-arrow">
-            <v-icon>mdi-chevron-left</v-icon> <!-- Left arrow -->
+            <v-icon>mdi-chevron-left</v-icon> 
         </v-btn>
-
         <v-btn @click="nextImage" icon class="right-arrow">
-            <v-icon>mdi-chevron-right</v-icon> <!-- Right arrow -->
+            <v-icon>mdi-chevron-right</v-icon>
         </v-btn>
     </div>
 </v-main>
@@ -28,10 +25,8 @@ export default {
     data() {
         return {
             images: [
-                require('@/assets/img/Ganga_Home.png'),
-                require('@/assets/img/Second.jpg'), 
-                require('@/assets/img/Third.jpg'),
-                require('@/assets/img/Fourth.jpg'),
+                require('@/assets/HomeImages/1.png'),
+                require('@/assets/HomeImages/2.png'),   
                 // Add more images here...
             ],
             currentIndex: 0, 
@@ -41,23 +36,27 @@ export default {
         FooterHome,
     },
     methods: {
-        // Go to the previous image
         prevImage() {
             if (this.currentIndex > 0) {
                 this.currentIndex--;
             } else {
-                this.currentIndex = this.images.length - 1; // Loop back to the last image
+                this.currentIndex = this.images.length - 1; 
             }
         },
-
-        // Go to the next image
         nextImage() {
             if (this.currentIndex < this.images.length - 1) {
                 this.currentIndex++;
             } else {
-                this.currentIndex = 0; // Loop back to the first image
+                this.currentIndex = 0;
             }
         },
+        startSlideshow() {
+            this.interval = setInterval(() => {
+                this.nextImage(); }, 2000);
+        },
+    },
+    mounted() {
+        this.startSlideshow();
     },
 };
 </script>
@@ -73,8 +72,7 @@ export default {
     position: absolute;
     top: 50%;
     transform: translateY(-50%);
-    z-index: 2;  
-     
+    z-index: 2;       
 }
 .left-arrow {
     left: 10px;

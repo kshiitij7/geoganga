@@ -1,6 +1,7 @@
 <template>
     <div ref="map" style=" width: 100%;height: 100%;position: relative;">
         <div id="mouse-pos" style="position: absolute; bottom:6.3%; left: 0%; background-color: black;color: white; padding: 0.1em 0.1em; border-radius: 4px; font-family: 'Poppins', sans-serif ; font-size: calc(4.5px + 0.45vw); z-index: 1000; pointer-events: none; max-width: 30%; text-align: center;"></div>
+        <v-icon class="resetButton"  @click="handleReset">mdi-refresh</v-icon>  
     </div>
     </template>
       
@@ -144,31 +145,27 @@
     
             this.map = map;
             this.cropInteraction = null;
-    
             this.measurementOverlays = [];
             // Listen to events from RightSideBar
             eventBus.on('set-measurement-mode', this.setMeasurementMode);
-            eventBus.on('clear-measurements', this.deactivateMeasurement);
             eventBus.on('clear-measurements', this.clearMeasurements);
             eventBus.on('cropToolToggled', this.toggleCropTool);
             eventBus.on('search-query', this.handleSearchQuery);
-    
-            
+
         },
-        
-    
+
         methods: {
+            handleReset() {
+                const view = this.map.getView();
+                view.animate({center: this.center, zoom: this.zoom, rotation: 0, duration: 1000 });
+            },
             setMeasurementMode(mode) {
-                this.deactivateMeasurement();
                 this.measurementMode = mode;
                 this.activateMeasurement(mode);
             },
             activateMeasurement(mode) {
                 const type = mode === 'Length' ? 'LineString' : 'Polygon';
-                this.drawInteraction = new Draw({
-                    source: this.measurementSource,
-                    type: type,
-                });
+                this.drawInteraction = new Draw({source: this.measurementSource,type: type, });
                 const measurementOverlay = document.createElement('div');
                 measurementOverlay.className = 'measurement-overlay';
                 measurementOverlay.style.position = 'absolute';
@@ -178,16 +175,11 @@
                 measurementOverlay.style.borderRadius = '4px';
                 measurementOverlay.style.fontSize = '12px';
                 measurementOverlay.style.pointerEvents = 'none';
-                const overlay = new Overlay({
-                    element: measurementOverlay,
-                    positioning: 'center-center',
-                    stopEvent: false,
-                });
+                const overlay = new Overlay({element: measurementOverlay,positioning: 'center-center',stopEvent: false,});
                 this.map.addOverlay(overlay);
-    
+
                 this.drawInteraction.on('drawstart', (event) => {
                     const geometry = event.feature.getGeometry();
-    
                     geometry.on('change', () => {
                         const coordinates = geometry.getLastCoordinate();
                         overlay.setPosition(coordinates);
@@ -207,12 +199,10 @@
                         }
                     });
                 });
-    
                 this.drawInteraction.on('drawend', (event) => {
                     const feature = event.feature;
                     const geometry = feature.getGeometry();
                     const transformedGeometry = geometry.clone().transform('EPSG:4326', 'EPSG:3857');
-    
                     if (mode === 'Length') {
                         const length = getLength(transformedGeometry);
                         const displayLength = length > 100 ? `${(length / 1000).toFixed(2)} km` : `${length.toFixed(2)} m`;
@@ -227,24 +217,21 @@
                 this.map.addInteraction(this.drawInteraction);
                 this.measurementOverlays.push(overlay);
             },
-    
-            deactivateMeasurement() {
+          
+            clearMeasurements() {
                 if (this.drawInteraction) {
                     this.map.removeInteraction(this.drawInteraction);
                 }
                 if (this.modifyInteraction) {
                     this.map.removeInteraction(this.modifyInteraction);
                 }
-            },
-            clearMeasurements() {
                 this.measurementSource.clear();
-                // Remove all overlays (measurements)
                 this.measurementOverlays.forEach((overlay) => {
                     this.map.removeOverlay(overlay);
                 });
-                this.measurementOverlays = []; // Reset the overlay array
+                this.measurementOverlays = []; 
             },
-    
+
             toggleCropTool(isActive) {
                 if (isActive) {
                     this.activateCropTool();
@@ -256,7 +243,7 @@
                 this.cropInteraction = new Draw({
                     source: this.cropSource,
                     type: 'Circle',
-                    geometryFunction: createBox(),  // Creating a rectangular crop area
+                    geometryFunction: createBox(),  
                 });
                 this.cropInteraction.on('drawend', (event) => {
                     const feature = event.feature;
@@ -271,9 +258,6 @@
                 if (this.cropInteraction) {
                     this.cropSource.clear();
                     this.map.removeInteraction(this.cropInteraction);
-                    // this.map.getView().setZoom(this.zoom); // Reset to original zoom
-                    // this.map.getView().setCenter(this.center);
-    
                 }
             },
             handleSearchQuery(query) {
@@ -312,7 +296,11 @@
         beforeUnmount() {
         eventBus.off('search-query', this.handleSearchQuery);  
         eventBus.off('set-measurement-mode', this.setMeasurementMode);
-        eventBus.off('clear-measurements', this.deactivateMeasurement);
       }
     };
     </script>
+
+<style scoped>
+.resetButton {top: 1%;right: 2.5%;position: absolute;padding: 0;color: var(--ol-subtle-foreground-color);font-weight: bold;text-decoration: none;font-size: inherit;text-align: center;height: 1.45em;width: 1.45em;line-height: .4em;background-color: var(--ol-background-color);border: none;border-radius: 2px;z-index: 1000;}
+.resetButton:hover, .resetButton:focus {text-decoration: none;outline: 1px solid var(--ol-subtle-foreground-color);color: var(--ol-foreground-color);}
+</style>

@@ -1,13 +1,13 @@
 <template>
     <div class="LeftSideBar">
         <v-main style="--v-layout-top: 0px;">
-            <v-navigation-drawer rail color="black" >
+            <v-navigation-drawer rail color="rgb(2, 42, 56)" >
             <v-list>
                <!-- Layers Button -->
                <v-list-item @click="openLeftDrawer('layers')" class="cursor-pointer">
                     <v-tooltip location="left">
                         <template v-slot:activator="{ props: tooltip }">
-                            <v-icon v-bind="tooltip">mdi-layers-triple</v-icon>
+                            <v-icon style="color: wheat;" v-bind="tooltip">mdi-layers-triple</v-icon>
                         </template>
                         <span>Layers</span>
                     </v-tooltip>
@@ -17,7 +17,7 @@
                 <v-list-item @click="openLeftDrawer('timeSeries')" class="cursor-pointer">
                     <v-tooltip location="left">
                         <template v-slot:activator="{ props: tooltip }">
-                            <v-icon v-bind="tooltip">mdi-chart-timeline</v-icon>
+                            <v-icon style="color: wheat;" v-bind="tooltip">mdi-chart-timeline</v-icon>
                         </template>
                         <span>Time Series</span>
                     </v-tooltip>
@@ -28,7 +28,7 @@
                     <v-list-item-title>
                         <v-tooltip location="right">
                             <template v-slot:activator="{ props: tooltip }">
-                                <v-icon v-bind="tooltip">mdi-information</v-icon>
+                                <v-icon style="color: wheat;" v-bind="tooltip">mdi-information</v-icon>
                             </template>
                             <span>Feature Info</span>
                         </v-tooltip>
@@ -40,7 +40,7 @@
                     <v-list-item-title>
                         <v-tooltip location="right">
                             <template v-slot:activator="{ props: tooltip }">
-                                <v-icon v-bind="tooltip">mdi-compare</v-icon>
+                                <v-icon style="color: wheat;" v-bind="tooltip">mdi-compare</v-icon>
                             </template>
                             <span>Compare Tool</span>
                         </v-tooltip>
