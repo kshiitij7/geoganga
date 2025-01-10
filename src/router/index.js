@@ -1,19 +1,12 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import HomePage from '@/components/HomePage.vue';
-import AboutPage from '@/components/AboutPage.vue';
-import GangaBasin from '@/Dashboards/GangaBasin.vue';
-import WaterQuality from '@/Dashboards/WaterQuality.vue';
-import FloodHazard from '@/Dashboards/FloodHazard.vue';
-import SolidWaste from '@/Dashboards/SolidWaste.vue';
-
 
 const routes = [
-  { path : '/', name : 'HomePage', component : HomePage,  },
-  { path : '/about', name : 'AboutPage', component : AboutPage,  },
-  { path : '/basin', name : 'GangaBasin', component : GangaBasin,  },
-  { path : '/quality', name : 'WaterQuality', component : WaterQuality,  },
-  { path : '/flood', name : 'FloodHazard', component : FloodHazard,  },
-  { path : '/solid', name : 'SolidWaste', component : SolidWaste,  },
+  { path : '/', name : 'HomePage', component : () => import('@/components/HomePage.vue')  },
+  { path : '/about', name : 'AboutPage', component : () => import('@/components/AboutPage.vue')  },
+  { path : '/basin', name : 'GangaBasin', component : () => import('@/Dashboards/GangaBasin.vue')  },
+  { path : '/quality', name : 'WaterQuality', component : () => import('@/Dashboards/WaterQuality.vue')  },
+  { path : '/flood', name : 'FloodHazard', component : () => import('@/Dashboards/FloodHazard.vue') },
+  { path : '/solid', name : 'SolidWaste', component : () => import('@/Dashboards/SolidWaste.vue')  },
 ]
 
 const router = createRouter({

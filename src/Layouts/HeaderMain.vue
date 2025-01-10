@@ -6,9 +6,9 @@
             <v-spacer></v-spacer>
             
                 <div class="header-text" >
-                    <h3 class="mb-0">भारतीय अंतरिक्ष अनुसंधान संगठन, अंतरिक्ष विभाग</h3>
-                    <h3 class="mb-0">Indian Space Research Organisation, Department of Space</h3>
-                    <h3 class="mb-0">भारत सरकार / Government of India</h3>
+                    <h3>भारतीय अंतरिक्ष अनुसंधान संगठन, अंतरिक्ष विभाग</h3>
+                    <h3>Indian Space Research Organisation, Department of Space</h3>
+                    <h3>भारत सरकार / Government of India</h3>
                 </div>
            
             <v-spacer></v-spacer>
@@ -36,7 +36,6 @@
         line-height: 1.1;
         margin-top: 5px;
         font-family: 'Poppins', sans-serif;
-        font-weight: 300; 
         text-align: center; 
     }
   

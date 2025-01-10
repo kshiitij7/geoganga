@@ -23,7 +23,7 @@
     </v-container>
 </v-footer>
 
-<v-divider></v-divider>
+
 
 <v-footer location="bottom" color="#022a38" height="30">
     <h5 class="footer-text"> Copyright © 2025 All Rights Reserved</h5>

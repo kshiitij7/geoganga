@@ -137,6 +137,8 @@
             </div>
         </v-card-text>
     </v-card>
+    <v-divider :thickness="3"></v-divider>
+                    <v-img src="../assets/rightPng/weather_tool.png" style="margin-top: 80px; opacity: 0.7;" max-height="300" contain></v-img>
                 </div>
             </v-navigation-drawer>
         </v-main>
@@ -156,6 +158,10 @@
                 searchQuery: '',
                 activeMeasurement: null,
                 cropToolActive: false,
+
+                weatherData: null,
+                isWeatherLoading: false,
+                 weatherError: null,
             };
         },
     

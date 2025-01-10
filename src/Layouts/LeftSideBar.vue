@@ -61,10 +61,10 @@
                     <div class="text-h7" style="font-family: 'Poppins', sans-serif; font-weight:500; margin-top: 20px; margin-left: 20px;">Base Maps</div>
                 </v-title>
                 <v-select v-model="baseMaps" :items="baseMapsLayers" label="Please Select a Map" required></v-select>
-                <v-title>
-                    <div class="text-h7" style="font-family: 'Poppins', sans-serif; font-weight:500; margin-top: 20px; margin-left: 20px;">Administrative Boundaries</div>
-                </v-title>
-                <v-select style="margin-bottom: 50px;" chips multiple clearable v-model="adminBoundary" :items="adminBoundaryLayers" label="Please Select a Layer" required></v-select>
+               
+                <v-title><div class="text-h7" style="font-family: 'Poppins', sans-serif; font-weight:500; margin-top: 20px; margin-left: 20px;">Administrative Boundaries</div></v-title>
+                <v-select style="margin-bottom: 50px;" chips multiple clearable  v-model="adminBoundary" :items="adminBoundaryLayers" label="Please Select a Layer" required @change="onLayerToggle"/>
+
                 <v-divider :thickness="3"></v-divider>
               </div>
             <!-- Time Series Content -->

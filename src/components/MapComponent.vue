@@ -37,6 +37,7 @@
             minZoom: {type: Number, required: true,},
             dashLayers: {type: Array,required: true,},
         },
+        
         mounted() {
             const osm = new TileLayer({
                 title: 'Open Street Map',
@@ -104,17 +105,26 @@
                 }),
                 visible: false,
             });
-       
-    
-            const baseMaps = [bhuvan, osm, bing, SubDistrictsBoundary,DistrictsBoundary,StatesBoundary,indiaCountryBoundary,  ];
+            const evapo = new TileLayer({
+                title: 'evapotranspiration',
+                type: 'overlay',
+                source: new TileWMS({
+                    url: 'http://192.168.17.37:8080/geoserver/Geo-Ganga/wms?',
+                    params: {'LAYERS': 'EV_20240001','TILED': true,'VERSION': '1.1.1',},
+                    serverType: 'geoserver',
+                    tileGrid: new TileWMS().getTileGridForProjection(getProjection('EPSG:4326')),
+                }),
+                visible: false,
+            });
+
+            const baseMaps = [bhuvan, osm, bing, SubDistrictsBoundary,DistrictsBoundary,StatesBoundary,indiaCountryBoundary, evapo  ];
        
             const map = new Map({
                 target: this.$refs.map,
                 layers: baseMaps, 
                 view: new View({projection: 'EPSG:4326',center: this.center,zoom: this.zoom,minZoom: this.minZoom, }),
             });
-               
-    
+
             const mousePositionControl = new MousePosition({projection: 'EPSG:4326',coordinateFormat: createStringXY(4),target: document.getElementById('mouse-pos'), className: '',});
             map.addControl(mousePositionControl);
     
@@ -131,7 +141,7 @@
             this.measurementSource = new VectorSource();
             this.measurementLayer = new VectorLayer({
                 source: this.measurementSource,
-                style: {'fill-color': 'rgba(255, 255, 255, 0.2)', 'stroke-color': 'rgba(255, 255, 255, 0.8)','stroke-lineDash': [10, 10],'stroke-width': 3, },
+                style: {'fill-color': 'rgba(2, 42, 56, 0.2)', 'stroke-color': 'blue','stroke-width': 2, },
             });
             map.addLayer(this.measurementLayer);
     
@@ -139,7 +149,7 @@
               this.cropSource = new VectorSource();
                 this.cropLayer = new VectorLayer({
                 source: this.cropSource,
-                style: {'stroke-color': 'yellow','stroke-lineDash': [10, 10],'stroke-width': 3,}
+                style: {'stroke-color': 'blue','stroke-width': 2,}
             });
             map.addLayer(this.cropLayer);
     
@@ -148,10 +158,10 @@
             this.measurementOverlays = [];
             // Listen to events from RightSideBar
             eventBus.on('set-measurement-mode', this.setMeasurementMode);
+            eventBus.on('clear-measurements', this.deactivateMeasurement);
             eventBus.on('clear-measurements', this.clearMeasurements);
             eventBus.on('cropToolToggled', this.toggleCropTool);
             eventBus.on('search-query', this.handleSearchQuery);
-
         },
 
         methods: {
@@ -160,6 +170,7 @@
                 view.animate({center: this.center, zoom: this.zoom, rotation: 0, duration: 1000 });
             },
             setMeasurementMode(mode) {
+                this.deactivateMeasurement();
                 this.measurementMode = mode;
                 this.activateMeasurement(mode);
             },
@@ -169,11 +180,11 @@
                 const measurementOverlay = document.createElement('div');
                 measurementOverlay.className = 'measurement-overlay';
                 measurementOverlay.style.position = 'absolute';
-                measurementOverlay.style.backgroundColor = 'rgba(0, 0, 0, 0.7)';
-                measurementOverlay.style.color = 'white';
+                measurementOverlay.style.backgroundColor = 'rgba(2, 42, 56,0.9)';
+                measurementOverlay.style.color = 'wheat';
                 measurementOverlay.style.padding = '2px 4px';
                 measurementOverlay.style.borderRadius = '4px';
-                measurementOverlay.style.fontSize = '12px';
+                measurementOverlay.style.fontSize = '13px';
                 measurementOverlay.style.pointerEvents = 'none';
                 const overlay = new Overlay({element: measurementOverlay,positioning: 'center-center',stopEvent: false,});
                 this.map.addOverlay(overlay);
@@ -218,13 +229,15 @@
                 this.measurementOverlays.push(overlay);
             },
           
-            clearMeasurements() {
+            deactivateMeasurement() {
                 if (this.drawInteraction) {
                     this.map.removeInteraction(this.drawInteraction);
                 }
                 if (this.modifyInteraction) {
                     this.map.removeInteraction(this.modifyInteraction);
                 }
+            },
+            clearMeasurements() {
                 this.measurementSource.clear();
                 this.measurementOverlays.forEach((overlay) => {
                     this.map.removeOverlay(overlay);
@@ -265,15 +278,9 @@
                 this.searchPlace(query);
             },
             flyTo(location, zoomLevel) {
-        const view = this.map.getView();
-    
-        // Animate the transition to the new location
-        view.animate({
-            center: location,
-            zoom: zoomLevel,
-            duration: 1000 // 5 seconds
-        });
-    },
+                const view = this.map.getView();
+                view.animate({center: location,zoom: zoomLevel,duration: 1000  });
+            },
             async searchPlace(query) {
                 try {
                     const response = await axios.get('https://nominatim.openstreetmap.org/search', {
@@ -296,6 +303,7 @@
         beforeUnmount() {
         eventBus.off('search-query', this.handleSearchQuery);  
         eventBus.off('set-measurement-mode', this.setMeasurementMode);
+        eventBus.off('clear-measurements', this.deactivateMeasurement);
       }
     };
     </script>
