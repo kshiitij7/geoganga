@@ -5,7 +5,7 @@
         <router-link :to="tab.route">
             <v-btn :class="{'active': isActive(tab.route)}">
                 <v-icon :icon="tab.icon" size="x-large" style="color: rgb(2, 42, 56);"></v-icon>
-                <div style="color: rgb(2, 42, 56); font-family: 'Poppins', sans-serif; font-weight: bold;">{{ tab.name }}</div>
+                <div style="color: rgb(2, 42, 56); font-family: 'Poppins', sans-serif; font-weight: 500;">{{ tab.name }}</div>
             </v-btn>
         </router-link>
     </div>

@@ -133,7 +133,7 @@ export default {
 }
 .card {
     position: absolute;
-    top: 4%;
+    top: 8%;
     right: 6%;
     z-index: 2;
     opacity: 0.8;
