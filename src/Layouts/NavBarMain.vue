@@ -1,5 +1,5 @@
 <template>
-<v-app-bar app color="white" dark class="button-bar" height="50" elevation="2">
+<v-app-bar app color="white" dark class="button-bar" height="40" elevation="2">
     <v-spacer></v-spacer>
     <div v-for="tab in tabs" :key="tab.route">
         <router-link :to="tab.route">
@@ -9,7 +9,7 @@
             </v-btn>
         </router-link>
     </div>
-    <v-img :src="nmcg" max-width="130" max-height="50"></v-img>
+    
     <v-spacer></v-spacer>
 </v-app-bar>
 </template>
@@ -18,8 +18,7 @@
 export default {
     name: 'NavBarMain',
     data() {
-        return {
-            nmcg: require('@/assets/img/nmcgGif.gif'),
+        return {        
             tabs: [
                 {name: 'Home',route: '/',icon: 'mdi-home'},  
                 {name: 'Ganga Basin',route: '/basin',icon: 'mdi-leaf'},
@@ -42,7 +41,6 @@ export default {
 .active {
     height: 50px;
     background-color: rgba(2, 42, 56, 0.2);
-    color: wheat;
     font-size: 15px;
 }
 </style>

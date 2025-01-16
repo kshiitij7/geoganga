@@ -48,8 +48,7 @@
             const bing = new TileLayer({
                 title: 'Bing',
                 type: 'overlay',
-                source: new BingMaps({ key: "ArIdKOW0eb8TRcLZdt0l2cG8kHA_uW92yIvx1aFzsQ1xHxpnVRMGmO0N0neY8P90", imagerySet: 'AerialWithLabels',
-                }),
+                source: new BingMaps({ key: "ArIdKOW0eb8TRcLZdt0l2cG8kHA_uW92yIvx1aFzsQ1xHxpnVRMGmO0N0neY8P90", imagerySet: 'AerialWithLabels',}),
                 visible: true,
             });
             const bhuvan = new TileLayer({
@@ -286,44 +285,60 @@
                 view.animate({center: location,zoom: zoomLevel,duration: 1000  });
             },
             async searchPlace(query) {
-    try {
-        const response = await axios.get('https://nominatim.openstreetmap.org/search', {
-            params: {
-                q: query,
-                format: 'json',
-                addressdetails: 1,
-                limit: 1,
-            },
-        });
-        const results = response.data;
-        if (results.length > 0) {
-            const place = results[0];
-            const lat = parseFloat(place.lat);
-            const lon = parseFloat(place.lon);
-            const extent = {minLon: 73.3833755597237030,minLat: 21.5371089367655273,maxLon: 89.0949098789741356,maxLat: 31.4545096734450453, };
-            if (lon >= extent.minLon &&lon <= extent.maxLon &&lat >= extent.minLat &&lat <= extent.maxLat) 
-            {
-                this.flyTo([lon, lat], 18); 
-            } else {
-                alert('The searched location is outside the Ganga Basin Boundary!');
+                try {
+                    const response = await axios.get('https://nominatim.openstreetmap.org/search', {
+                        params: {q: query,format: 'json',addressdetails: 1,limit: 1,},
+            });
+            const results = response.data;
+            if (results.length > 0) {
+                const place = results[0];
+                const lat = parseFloat(place.lat);
+                const lon = parseFloat(place.lon);
+                const extent = {minLon: 73.3833755597237030,minLat: 21.5371089367655273,maxLon: 89.0949098789741356,maxLat: 31.4545096734450453, };
+                if (lon >= extent.minLon &&lon <= extent.maxLon &&lat >= extent.minLat &&lat <= extent.maxLat) 
+                {
+                    this.flyTo([lon, lat], 18); 
+                }   else {
+                            alert('The searched location is outside the Ganga Basin Boundary!');
+                        }
+                } else {
+                    alert('Location not found!');
+                }
+            } catch (error) {
+                    console.error('Search failed', error);
             }
-        } else {
-            alert('Location not found!');
-        }
-    } catch (error) {
-        console.error('Search failed', error);
-    }
-}
+            }
         },
         beforeUnmount() {
-        eventBus.off('search-query', this.handleSearchQuery);  
-        eventBus.off('set-measurement-mode', this.setMeasurementMode);
-        eventBus.off('clear-measurements', this.deactivateMeasurement);
-      }
+            eventBus.off('search-query', this.handleSearchQuery);  
+            eventBus.off('set-measurement-mode', this.setMeasurementMode);
+            eventBus.off('clear-measurements', this.deactivateMeasurement);
+        }
     };
     </script>
 
 <style scoped>
-.resetButton {top: 1%;right: 2.5%;position: absolute;padding: 0;color: var(--ol-subtle-foreground-color);font-weight: bold;text-decoration: none;font-size: inherit;text-align: center;height: 1.45em;width: 1.45em;line-height: .4em;background-color: var(--ol-background-color);border: none;border-radius: 2px;z-index: 1000;}
-.resetButton:hover, .resetButton:focus {text-decoration: none;outline: 1px solid var(--ol-subtle-foreground-color);color: var(--ol-foreground-color);}
+.resetButton {
+    top: 1%;
+    right: 2.5%;
+    position: absolute;
+    padding: 0;
+    color: var(--ol-subtle-foreground-color);
+    font-weight: bold;
+    text-decoration: none;
+    font-size: inherit;
+    text-align: center;
+    height: 1.45em;
+    width: 1.45em;
+    line-height: .4em;
+    background-color: var(--ol-background-color);
+    border: none;
+    border-radius: 2px;
+    z-index: 1000;
+}
+.resetButton:hover, .resetButton:focus {
+    text-decoration: none;
+    outline: 1px solid var(--ol-subtle-foreground-color);
+    color: var(--ol-foreground-color);
+    }
 </style>

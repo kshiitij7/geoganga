@@ -2,7 +2,7 @@
 <div class="WaterQuality">
     <v-main>
         <LeftSideBar />
-        <div style="height: 86vh;">
+        <div style="height: 87.1vh;">
             <MapComponent :dashLayers= "mapLayers" :center="[80.3319, 26.4499]" :zoom="10" :minZoom="5.5"/>
         </div>
             <RightSideBar />     
