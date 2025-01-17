@@ -15,7 +15,7 @@
         <v-btn @click="nextImage" icon class="right-arrow">
             <v-icon>mdi-chevron-right</v-icon>
         </v-btn>
-
+        
         <!-- Card Section -->
         <v-expand-transition>
             <v-card v-if="showCard" :key="currentCardIndex" :prepend-icon="currentCard.icon" width="400" class="card">

@@ -33,27 +33,25 @@
         name: 'MapComponent',
         props: {
             center: {type: Array,required: true,},
-            zoom: {type: Number,required: true,},
-            minZoom: {type: Number, required: true,},
-            dashLayers: {type: Array,required: true,},
+            zoom: {type: Number,required: true,},       
         },
         
         mounted() {
             const osm = new TileLayer({
                 title: 'Open Street Map',
-                type: 'overlay',
+                type: 'base',
                 source: new OSM(),
                 visible: false,
             });
             const bing = new TileLayer({
                 title: 'Bing',
-                type: 'overlay',
+                type: 'base',
                 source: new BingMaps({ key: "ArIdKOW0eb8TRcLZdt0l2cG8kHA_uW92yIvx1aFzsQ1xHxpnVRMGmO0N0neY8P90", imagerySet: 'AerialWithLabels',}),
                 visible: true,
             });
             const bhuvan = new TileLayer({
                 title: 'Bhuvan',
-                type: 'overlay',
+                type: 'base',
                 source: new TileWMS({
                     params: {FORMAT: "image/jpeg", VERSION: "1.1.1", tiled: true, LAYERS: "bhuvan_imagery", exceptions: "application/vnd.ogc.se_inimage",},
                     url: "https://bhuvan-ras2.nrsc.gov.in/tilecache/tilecache.py",
@@ -117,15 +115,11 @@
             });
 
             const baseMaps = [bhuvan, osm, bing, SubDistrictsBoundary,DistrictsBoundary,StatesBoundary,indiaCountryBoundary, evapo  ];
-            baseMaps.forEach((layer) => {
-                layer.on('change:visible', () => {
-                    if (layer.getVisible()) {
-                        baseMaps.forEach((otherLayer) => {if (otherLayer !== layer) {otherLayer.setVisible(false);}});}});});
-       
+            
             const map = new Map({
                 target: this.$refs.map,
                 layers: baseMaps, 
-                view: new View({projection: 'EPSG:4326',center: this.center,zoom: this.zoom,minZoom: this.minZoom, }),
+                view: new View({projection: 'EPSG:4326', center:this.center, minZoom:6.5, zoom:this.zoom, maxZoom:19.4, extent: [68.1, 6.46, 97.4, 37.09] }),
             });
 
             const mousePositionControl = new MousePosition({projection: 'EPSG:4326',coordinateFormat: createStringXY(4),target: document.getElementById('mouse-pos'), className: '',});

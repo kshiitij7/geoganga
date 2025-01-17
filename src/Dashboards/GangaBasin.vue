@@ -3,7 +3,7 @@
     <v-main>
         <LeftSideBar />
         <div style="height: 87.1vh;">
-            <MapComponent  :center="[82.0662, 26.2648]" :zoom="6.5" :minZoom="6.5" />
+            <MapComponent  :center="[82.0662, 26.2648]" :zoom="6.5" />
         </div>
         <RightSideBar />
     </v-main>
@@ -27,7 +27,7 @@ export default {
     },
     data() {
         return {
-            mapLayers: [],
+           mapLayers: [],   
         };
     },
 
