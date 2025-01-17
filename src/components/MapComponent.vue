@@ -282,7 +282,7 @@
             },
             flyTo(location, zoomLevel) {
                 const view = this.map.getView();
-                view.animate({center: location,zoom: zoomLevel,duration: 1000  });
+                view.animate({center: location, zoom: zoomLevel, duration: 2000  });
             },
             async searchPlace(query) {
                 try {
@@ -297,7 +297,7 @@
                 const extent = {minLon: 73.3833755597237030,minLat: 21.5371089367655273,maxLon: 89.0949098789741356,maxLat: 31.4545096734450453, };
                 if (lon >= extent.minLon &&lon <= extent.maxLon &&lat >= extent.minLat &&lat <= extent.maxLat) 
                 {
-                    this.flyTo([lon, lat], 18); 
+                    this.flyTo([lon, lat], 16 ); 
                 }   else {
                             alert('The searched location is outside the Ganga Basin Boundary!');
                         }
