@@ -166,11 +166,7 @@
         };
 
         // Listen for layer toggle events
-        eventBus.on('toggle-layer-visibility', ({
-            name,
-            visible
-        }) => {
-
+        eventBus.on('toggle-layer-visibility', ({name,visible }) => {
             const layer = this.layers[name];
             if (layer) {
                 layer.setVisible(visible);
@@ -178,8 +174,10 @@
                 console.log(`"${name}" not found`);
             }
         });
+
             this.cropInteraction = null;
             this.measurementOverlays = [];
+            
             // Listen to events from RightSideBar
             eventBus.on('set-measurement-mode', this.setMeasurementMode);
             eventBus.on('clear-measurements', this.deactivateMeasurement);
@@ -251,8 +249,7 @@
                 });
                 this.map.addInteraction(this.drawInteraction);
                 this.measurementOverlays.push(overlay);
-            },
-          
+            },      
             deactivateMeasurement() {
                 if (this.drawInteraction) {
                     this.map.removeInteraction(this.drawInteraction);
@@ -265,8 +262,9 @@
                 this.measurementSource.clear();
                 this.measurementOverlays.forEach((overlay) => {
                     this.map.removeOverlay(overlay);
+                    this.measurementOverlays = []; 
                 });
-                this.measurementOverlays = []; 
+                
             },
 
             toggleCropTool(isActive) {
@@ -298,7 +296,6 @@
                 }
             },
             handleSearchQuery(query) {
-                console.log('Search query received:', query);
                 this.searchPlace(query);
             },
             flyTo(location, zoomLevel) {

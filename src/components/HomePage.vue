@@ -76,6 +76,7 @@ export default {
             images: [
                 require('@/assets/HomeImages/1.png'),
                 require('@/assets/HomeImages/2.png'),
+                require('@/assets/HomeImages/3.png'),
                 // Add more images here...
             ],
             currentImageIndex: 0,
