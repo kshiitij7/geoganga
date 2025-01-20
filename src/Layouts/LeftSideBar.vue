@@ -54,6 +54,10 @@
             <!-- Layers Content -->
             <div v-if="activeLeftTab === 'layers'">
                 <v-list>
+                    <v-list-item>
+                    <div class="text-h5" style="font-family: 'Poppins', sans-serif; font-weight:500; text-align: center;">Layers</div>
+                </v-list-item>
+                <v-divider :thickness="2" color="black"></v-divider>
                     <v-expansion-panels>
                         <v-expansion-panel elevation="0">
                             <v-expansion-panel-title>Administrative Boundaries</v-expansion-panel-title>
@@ -80,6 +84,7 @@
                             </v-expansion-panel-text>
                         </v-expansion-panel>
                     </v-expansion-panels>
+                    <v-divider></v-divider>
                 </v-list>
             </div>
             <!-- Time Series Content -->

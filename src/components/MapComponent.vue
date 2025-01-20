@@ -23,11 +23,11 @@
     import {ScaleLine} from 'ol/control.js';
     import {getLength, getArea} from 'ol/sphere';
     import Overlay from 'ol/Overlay.js';
-    import eventBus from '@/event-bus';
     import { createBox } from 'ol/interaction/Draw';
     import MousePosition from 'ol/control/MousePosition.js';
     import {createStringXY} from 'ol/coordinate.js';
     import axios from 'axios';
+    import eventBus from '@/event-bus';
     
     export default {
         name: 'MapComponent',
@@ -35,6 +35,12 @@
             center: {type: Array,required: true,},
             zoom: {type: Number,required: true,},       
         },
+        data() {
+        return {
+            layers: {},
+            map: null,
+        };
+    },
         
         mounted() {
             const osm = new TileLayer({
@@ -46,7 +52,7 @@
             const bing = new TileLayer({
                 title: 'Bing',
                 type: 'base',
-                source: new BingMaps({ key: "ArIdKOW0eb8TRcLZdt0l2cG8kHA_uW92yIvx1aFzsQ1xHxpnVRMGmO0N0neY8P90", imagerySet: 'AerialWithLabels',}),
+                source: new BingMaps({ key: "ArIdKOW0eb8TRcLZdt0l2cG8kHA_uW92yIvx1aFzsQ1xHxpnVRMGmO0N0neY8P90", imagerySet: 'AerialWithLabelsOnDemand',}),
                 visible: true,
             });
             const bhuvan = new TileLayer({
@@ -58,8 +64,23 @@
                 }),
                 visible: false,
             });
+            const baseMaps = [bhuvan, osm, bing,];
+
+            const basinBoundary = new TileLayer({
+            type: 'overlay',
+            source: new TileWMS({
+                url: 'http://192.168.17.37:8080/geoserver/Geo-Ganga/wms?',
+                params: {
+                    'LAYERS': 'Ganga_Basin_v4',
+                    'TILED': true,
+                    'VERSION': '1.1.1',
+                },
+                serverType: 'geoserver',
+                tileGrid: new TileWMS().getTileGridForProjection(getProjection('EPSG:4326')),
+            }),
+            visible: true,
+        });
             const indiaCountryBoundary = new TileLayer({
-                title: 'India Boundary',
                 type: 'overlay',
                 source: new TileWMS({
                     url: 'http://192.168.17.37:8080/geoserver/Geo-Ganga/wms?',
@@ -70,7 +91,6 @@
                 visible: true,
             });
             const StatesBoundary = new TileLayer({
-                title: 'State Boundary',
                 type: 'overlay',
                 source: new TileWMS({
                     url: 'http://192.168.17.37:8080/geoserver/Geo-Ganga/wms?',
@@ -81,7 +101,6 @@
                 visible: false,
             });
             const DistrictsBoundary = new TileLayer({
-                title: 'District Boundary',
                 type: 'overlay',
                 source: new TileWMS({
                     url: 'http://192.168.17.37:8080/geoserver/Geo-Ganga/wms?',
@@ -92,7 +111,6 @@
                 visible: false,
             });
             const SubDistrictsBoundary = new TileLayer({
-                title: 'Sub-District Boundary',
                 type: 'overlay',
                 source: new TileWMS({
                     url: 'http://192.168.17.37:8080/geoserver/Geo-Ganga/wms?',
@@ -102,23 +120,11 @@
                 }),
                 visible: false,
             });
-            const evapo = new TileLayer({
-                title: 'evapotranspiration',
-                type: 'overlay',
-                source: new TileWMS({
-                    url: 'http://192.168.17.37:8080/geoserver/Geo-Ganga/wms?',
-                    params: {'LAYERS': 'EV_20240001','TILED': true,'VERSION': '1.1.1',},
-                    serverType: 'geoserver',
-                    tileGrid: new TileWMS().getTileGridForProjection(getProjection('EPSG:4326')),
-                }),
-                visible: false,
-            });
+            const boundaries = [basinBoundary, indiaCountryBoundary, StatesBoundary, DistrictsBoundary, SubDistrictsBoundary];
 
-            const baseMaps = [bhuvan, osm, bing, SubDistrictsBoundary,DistrictsBoundary,StatesBoundary,indiaCountryBoundary, evapo  ];
-            
             const map = new Map({
                 target: this.$refs.map,
-                layers: baseMaps, 
+                layers: [ ...baseMaps, ...boundaries ], 
                 view: new View({projection: 'EPSG:4326', center:this.center, minZoom:6.5, zoom:this.zoom, maxZoom:19.4, extent: [68.1, 6.46, 97.4, 37.09] }),
             });
 
@@ -151,6 +157,27 @@
             map.addLayer(this.cropLayer);
     
             this.map = map;
+            this.layers = {
+            'Ganga Basin': basinBoundary,
+            'India Boundary': indiaCountryBoundary,
+            'States': StatesBoundary,
+            'Districts': DistrictsBoundary,
+            'Sub-Districts': SubDistrictsBoundary
+        };
+
+        // Listen for layer toggle events
+        eventBus.on('toggle-layer-visibility', ({
+            name,
+            visible
+        }) => {
+
+            const layer = this.layers[name];
+            if (layer) {
+                layer.setVisible(visible);
+            } else {
+                console.log(`"${name}" not found`);
+            }
+        });
             this.cropInteraction = null;
             this.measurementOverlays = [];
             // Listen to events from RightSideBar
