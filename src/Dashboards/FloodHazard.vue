@@ -2,7 +2,7 @@
 <div class="FloodHazard">
     <v-main>
         <LeftSideBar />
-        <div style="height: 87.1vh;">
+        <div style="height: 86vh;">
             <MapComponent :center="[82.5644, 25.1441]" :zoom="10"  />
         </div>
         <RightSideBar />

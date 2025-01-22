@@ -39,6 +39,15 @@
         return {
             layers: {},
             map: null,
+            measurementSource: null,
+            measurementLayer: null,
+            drawInteraction: null,
+            modifyInteraction: null,
+            measurementMode: null,
+            measurementOverlays: [],
+            cropSource: null,
+            cropLayer: null,
+            cropInteraction: null,
         };
     },
         
@@ -47,13 +56,13 @@
                 title: 'Open Street Map',
                 type: 'base',
                 source: new OSM(),
-                visible: false,
+                visible: true,
             });
             const bing = new TileLayer({
                 title: 'Bing',
                 type: 'base',
                 source: new BingMaps({ key: "ArIdKOW0eb8TRcLZdt0l2cG8kHA_uW92yIvx1aFzsQ1xHxpnVRMGmO0N0neY8P90", imagerySet: 'AerialWithLabelsOnDemand',}),
-                visible: true,
+                visible: false,
             });
             const bhuvan = new TileLayer({
                 title: 'Bhuvan',
@@ -331,7 +340,7 @@
             eventBus.off('search-query', this.handleSearchQuery);  
             eventBus.off('set-measurement-mode', this.setMeasurementMode);
             eventBus.off('clear-measurements', this.deactivateMeasurement);
-        }
+        },
     };
     </script>
 

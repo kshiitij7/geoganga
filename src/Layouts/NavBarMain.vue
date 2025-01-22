@@ -1,5 +1,5 @@
 <template>
-<v-app-bar app color="white" dark class="button-bar" height="40" elevation="2">
+<v-app-bar app color="white" dark class="button-bar" height="60" elevation="2">
     <v-spacer></v-spacer>
     <div v-for="tab in tabs" :key="tab.route">
         <router-link :to="tab.route">
@@ -9,7 +9,7 @@
             </v-btn>
         </router-link>
     </div>
-    
+    <v-img :src="gangaLogo" max-width="150" max-height="150"></v-img>
     <v-spacer></v-spacer>
 </v-app-bar>
 </template>
@@ -18,7 +18,8 @@
 export default {
     name: 'NavBarMain',
     data() {
-        return {        
+        return {   
+            gangaLogo: require('@/assets/img/geoganga_logo.png'),     
             tabs: [
                 {name: 'Home',route: '/',icon: 'mdi-home'},  
                 {name: 'Ganga Basin',route: '/basin',icon: 'mdi-leaf'},
@@ -39,7 +40,7 @@ export default {
 
 <style scoped>
 .active {
-    height: 50px;
+    height: 60px;
     background-color: rgba(2, 42, 56, 0.2);
     font-size: 15px;
 }

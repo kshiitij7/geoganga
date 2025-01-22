@@ -15,7 +15,7 @@
         <v-btn @click="nextImage" icon class="right-arrow">
             <v-icon>mdi-chevron-right</v-icon>
         </v-btn>
-        
+
         <!-- Card Section -->
         <v-expand-transition>
             <v-card v-if="showCard" :key="currentCardIndex" :prepend-icon="currentCard.icon" width="400" class="card">
@@ -76,7 +76,6 @@ export default {
             images: [
                 require('@/assets/HomeImages/1.png'),
                 require('@/assets/HomeImages/2.png'),
-                require('@/assets/HomeImages/3.png'),
                 // Add more images here...
             ],
             currentImageIndex: 0,
