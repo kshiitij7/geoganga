@@ -3,6 +3,19 @@
     <div id="mouse-pos" style="position: absolute; bottom:6.3%; left: 0%; background-color: black;color: white; padding: 0.1em 0.1em; border-radius: 4px; font-family: 'Poppins', sans-serif ; font-size: calc(4.5px + 0.45vw); z-index: 1000; pointer-events: none; max-width: 30%; text-align: center;"></div>
     <v-tooltip location="bottom"><template v-slot:activator="{ props: tooltip }"><v-icon v-bind="tooltip" class="resetButton" @click="handleReset">mdi-refresh</v-icon></template><span>Reset View</span></v-tooltip>
     <div id="popup" ref="popup" class="ol-popup" v-show="popupContent"><div v-html="popupContent"></div></div>
+    <div class="baseSwitcher">
+        <v-menu location="top">
+      <template v-slot:activator="{ props }">
+        <v-btn color="rgb(2, 42, 56)" dark v-bind="props"><div style="color: wheat;">Base Maps</div></v-btn>
+      </template>
+  <v-list>
+    <v-list-item v-for="(basemap, index) in basemaps" :key="index" class="mx-2" @click="switchBasemap(basemap.name)">
+        <v-img :src="basemap.icon" alt="Basemap Option" contain max-width="900" max-height="300" />
+      <v-list-item-title>{{ basemap.label }}</v-list-item-title>
+    </v-list-item>
+  </v-list>
+</v-menu>
+      </div>
 </div>
 </template>    
     
@@ -13,7 +26,6 @@ import BingMaps from 'ol/source/BingMaps';
 import View from 'ol/View';
 import TileLayer from 'ol/layer/Tile';
 import OSM from 'ol/source/OSM';
-import LayerSwitcher from 'ol-layerswitcher';
 import 'ol-layerswitcher/dist/ol-layerswitcher.css';
 import TileWMS from 'ol/source/TileWMS';
 import {get as getProjection} from 'ol/proj';
@@ -46,6 +58,11 @@ export default {
         return {
             layers: {},
             map: null,
+            basemaps: [
+                        { name: 'osm', label: 'Open Street Map', icon: require('@/assets/Base Maps/openstreetmap.png') },
+                        { name: 'bing', label: 'Bing Map', icon: require('@/assets/Base Maps/bing.png') },
+                        { name: 'bhuvan', label: 'Bhuvan Satellite Imagery', icon: require('@/assets/Base Maps/bhuvan.png') },
+                    ],
             measurementSource: null,
             measurementLayer: null,
             drawInteraction: null,
@@ -71,10 +88,8 @@ export default {
             this.map.addOverlay(this.popup);
         });
 
-        // Listen for feature info toggle from event bus
-
         const osm = new TileLayer({
-            title: 'Open Street Map',
+            title: 'osm',
             type: 'base',
             source: new OSM(),
             visible: true,
@@ -103,7 +118,7 @@ export default {
             }),
             visible: false,
         });
-        const baseMaps = [bhuvan, bing, osm, ];
+        this.baseMaps = [bhuvan, bing, osm, ];
 
         const basinBoundary = new TileLayer({
             name : 'Ganga Basin',
@@ -185,12 +200,9 @@ export default {
 
         const map = new Map({
             target: this.$refs.map,
-            layers: [...baseMaps,...projectBoundary, ...this.boundaries ],
+            layers: [...this.baseMaps, ...this.boundaries,...projectBoundary, ],
             view: new View({projection: 'EPSG:4326',center: this.center,minZoom: 6.5,zoom: this.zoom,maxZoom: 19.4,extent: [68.1, 6.46, 97.4, 37.09]}),
         });
-
-        const layerSwitcher = new LayerSwitcher({activationMode: 'click',startActive: false,tipLabel: 'Base Maps',collapseLabel: '\u00BB',expandLabel: '\u00AB',showRoot: false,});
-        map.addControl(layerSwitcher);
 
         const mousePositionControl = new MousePosition({projection: 'EPSG:4326',coordinateFormat: createStringXY(4),target: document.getElementById('mouse-pos'),className: '',});
         map.addControl(mousePositionControl);
@@ -243,6 +255,20 @@ export default {
     },
 
     methods: {
+        switchBasemap(baseMapName) {
+      // Set the visibility of basemaps
+      this.baseMaps.forEach((layer) => {
+        layer.setVisible(layer.get('title').toLowerCase() === baseMapName.toLowerCase());
+      });
+
+      // Update the current basemap icon
+      const selectedBasemap = this.basemaps.find(
+        (basemap) => basemap.name.toLowerCase() === baseMapName.toLowerCase()
+      );
+      if (selectedBasemap) {
+        this.currentBasemapIcon = selectedBasemap.icon;
+      }
+    },
         handleReset() {
             const view = this.map.getView();
             view.animate({
@@ -502,5 +528,11 @@ export default {
   min-width: 300px;
   max-height: 1200px;   
   pointer-events: none;
+}
+.baseSwitcher{
+    position:absolute;
+    z-index: 2;
+    top: 8%;
+    right: .5%;
 }
 </style>

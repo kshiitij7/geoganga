@@ -188,7 +188,7 @@ export default {
         },
         onProjectBoundaryVisibilityChange(projectLayer) {
                 eventBus.emit('toggle-layer-visibility', {name: projectLayer.name,visible: projectLayer.visible,});
-     },
+        },
      toggleFeatureInfo() {
         eventBus.emit('toggleFeatureInfo', this.featureInfoEnabled);
         if (this.featureInfoEnabled) {
