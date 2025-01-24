@@ -62,7 +62,7 @@
                         <v-expansion-panel elevation="0">
                             <v-expansion-panel-title>Administrative Boundaries</v-expansion-panel-title>
                             <v-expansion-panel-text>
-                                <!-- Layer Checkboxes -->
+                                <!-- Boundary Layer Checkboxes -->
                                 <v-list-item v-for="(adminLayer, index) in adminLayers" :key="index">
                                     <v-checkbox color="primary" :label="adminLayer.name" v-model="adminLayer.visible" 
                                     style="margin-top: -7px; margin-bottom: -38px; margin-left:-10px" 
@@ -75,7 +75,7 @@
                                 Project Boundaries
                             </v-expansion-panel-title>
                             <v-expansion-panel-text>
-                                <!-- Layer Checkboxes -->
+                                <!-- Project Layer Checkboxes -->
                                 <v-list-item v-for="(projectLayer, index) in projectLayers" :key="index">
                                     <v-checkbox color="primary" :label="projectLayer.name" v-model="projectLayer.visible" 
                                     style="margin-top: -7px; margin-bottom: -38px; margin-left:-10px" 
@@ -104,8 +104,7 @@
                     </v-card-title>
                     <v-divider :thickness="2" color="black"></v-divider>
                     <v-card-text>
-                        <v-switch color="blue" label="Enable Feature Info"></v-switch>
-
+                        <v-switch color="error" v-model="featureInfoEnabled" label="Enable Feature Info" @change="toggleFeatureInfo"></v-switch>
                     </v-card-text>
                 </v-card>
                 <v-divider :thickness="3"></v-divider>
@@ -150,6 +149,7 @@ export default {
             // Left 
             isLeftDrawerOpen: false,
             activeLeftTab: null,
+            featureInfoEnabled: false,
             leftSelect: null,
             rightSelect: null,
             adminLayers: [
@@ -161,6 +161,7 @@ export default {
             projectLayers: [
                             { name: 'Ganga Basin', visible: true },
                         ],
+           
         };
     },
     computed: {
@@ -188,6 +189,17 @@ export default {
         onProjectBoundaryVisibilityChange(projectLayer) {
                 eventBus.emit('toggle-layer-visibility', {name: projectLayer.name,visible: projectLayer.visible,});
      },
+     toggleFeatureInfo() {
+        eventBus.emit('toggleFeatureInfo', this.featureInfoEnabled);
+        if (this.featureInfoEnabled) {
+          document.body.style.cursor = 'grab';  
+        } else {
+          document.body.style.cursor = 'auto'; 
+        }
+        if (!this.featureInfoEnabled) {
+        eventBus.emit('hidePopup');
+      }
+      },
         handleCompare() {
             if (!this.showError) {
                 alert('Comparison started!');

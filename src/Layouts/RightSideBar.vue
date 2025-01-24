@@ -34,7 +34,7 @@
                                 <template v-slot:activator="{ props: tooltip }">
                                     <v-icon style="color: wheat;" v-bind="tooltip">mdi-crop</v-icon>
                                 </template>
-                                <span>Crop Tool</span>
+                                <span>Area Of Interest</span>
                             </v-tooltip>
                         </v-list-item-title>
                     </v-list-item>
@@ -163,8 +163,7 @@
                 isWeatherLoading: false,
                  weatherError: null,
             };
-        },
-    
+        },   
         methods: {
             openRightDrawer(tool) {
                 if (this.activeTool === tool && this.isRightDrawerOpen) {
