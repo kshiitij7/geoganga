@@ -2,7 +2,7 @@
 <div class="SolidWaste">
     <v-main>
         <LeftSideBar />
-        <div style="height: 86vh;">
+        <div style="height: 85vh;">
             <MapComponent :center="[82.0662, 26.2648]" :zoom="10"  />
         </div>
         <RightSideBar />

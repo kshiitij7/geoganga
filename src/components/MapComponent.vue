@@ -1,68 +1,82 @@
 <template>
 <div ref="map" style=" width: 100%;height: 100%;position: relative;">
     <div id="mouse-pos" style="position: absolute; bottom:6.3%; left: 0%; background-color: black;color: white; padding: 0.1em 0.1em; border-radius: 4px; font-family: 'Poppins', sans-serif ; font-size: calc(4.5px + 0.45vw); z-index: 1000; pointer-events: none; max-width: 30%; text-align: center;"></div>
-    <v-tooltip location="bottom"><template v-slot:activator="{ props: tooltip }"><v-icon v-bind="tooltip" class="resetButton" @click="handleReset">mdi-refresh</v-icon></template><span>Reset View</span></v-tooltip>
-    <div id="popup" ref="popup" class="ol-popup" v-show="popupContent"><div v-html="popupContent"></div></div>
-    <div class="baseSwitcher">
-        <v-menu location="top">
-      <template v-slot:activator="{ props }">
-        <v-btn color="rgb(2, 42, 56)" dark v-bind="props"><div style="color: wheat;">Base Maps</div></v-btn>
-      </template>
-  <v-list>
-    <v-list-item v-for="(basemap, index) in basemaps" :key="index" class="mx-2" @click="switchBasemap(basemap.name)">
-        <v-img :src="basemap.icon" alt="Basemap Option" contain max-width="900" max-height="300" />
-      <v-list-item-title>{{ basemap.label }}</v-list-item-title>
-    </v-list-item>
-  </v-list>
-</v-menu>
-      </div>
+    <v-icon title="Reset View" class="resetButton" @click="handleReset">mdi-refresh</v-icon>
+    <div id="popup" ref="popup" class="ol-popup" v-show="popupContent">
+        <div v-html="popupContent"></div>
+    </div>
+    <div id="baseSwitcher" style=" position: absolute;z-index: 2;bottom: 5%;right: 2%;">
+        <div class="active-base" @click="toggleBaseSwitcher" title="Base Maps">
+            <img :src="activeBaseMap.icon" :alt="activeBaseMap.label" class="active-icon" />
+        </div>
+        <div v-if="showBaseSwitcher" class="base-options">
+            <div v-for="(basemap, index) in basemaps" :key="index" class="cursor-pointer" @click="switchBaseMap(basemap)" :title="basemap.label">
+                <img :src="basemap.icon" :alt="basemap.label" class="base-icon" />
+            </div>
+        </div>
+    </div>
 </div>
-</template>    
-    
+</template>
+
 <script>
 import 'ol/ol.css';
-import { Map} from 'ol';
+import {
+    Map
+} from 'ol';
 import BingMaps from 'ol/source/BingMaps';
 import View from 'ol/View';
 import TileLayer from 'ol/layer/Tile';
 import OSM from 'ol/source/OSM';
 import 'ol-layerswitcher/dist/ol-layerswitcher.css';
 import TileWMS from 'ol/source/TileWMS';
-import {get as getProjection} from 'ol/proj';
+import {
+    get as getProjection
+} from 'ol/proj';
 import FullScreen from 'ol/control/FullScreen';
-import {Draw} from 'ol/interaction';
-import {Vector as VectorSource} from 'ol/source';
-import {Vector as VectorLayer} from 'ol/layer';
-import {ScaleLine} from 'ol/control.js';
-import {getLength,getArea} from 'ol/sphere';
+import {
+    Draw
+} from 'ol/interaction';
+import {
+    Vector as VectorSource
+} from 'ol/source';
+import {
+    Vector as VectorLayer
+} from 'ol/layer';
+import {
+    ScaleLine
+} from 'ol/control.js';
+import {
+    getLength,
+    getArea
+} from 'ol/sphere';
 import Overlay from 'ol/Overlay.js';
-import {createBox} from 'ol/interaction/Draw';
+import {
+    createBox
+} from 'ol/interaction/Draw';
 import MousePosition from 'ol/control/MousePosition.js';
-import {createStringXY} from 'ol/coordinate.js';
+import {
+    createStringXY
+} from 'ol/coordinate.js';
 import axios from 'axios';
 import eventBus from '@/event-bus';
 
 export default {
     name: 'MapComponent',
     props: {
-        center: {
-            type: Array,
-            required: true,
-        },
-        zoom: {
-            type: Number,
-            required: true,
-        },
+        center: {type: Array,required: true,},
+        zoom: {type: Number,required: true,},
     },
     data() {
         return {
             layers: {},
             map: null,
+            showBaseSwitcher: false,
+            activeBaseMap: { name: "osm",icon: require("@/assets/Base Maps/osm_map.png"),},
             basemaps: [
-                        { name: 'osm', label: 'Open Street Map', icon: require('@/assets/Base Maps/openstreetmap.png') },
-                        { name: 'bing', label: 'Bing Map', icon: require('@/assets/Base Maps/bing.png') },
-                        { name: 'bhuvan', label: 'Bhuvan Satellite Imagery', icon: require('@/assets/Base Maps/bhuvan.png') },
-                    ],
+                { name: "Bhuvan",label: "Bhuvan Satellite Imagery",icon: require("@/assets/Base Maps/bhuvan_map.png")},
+                { name: "osm",label: "Open Street Map",icon: require("@/assets/Base Maps/osm_map.png")},
+                { name: "Bing",label: "Bing Map",icon: require("@/assets/Base Maps/bing_map.png")},
+            ],
             measurementSource: null,
             measurementLayer: null,
             drawInteraction: null,
@@ -72,12 +86,11 @@ export default {
             cropSource: null,
             cropLayer: null,
             cropInteraction: null,
-            popupContent: null, // Content for the popup
-            popup: null, // Overlay for the popup
+            popupContent: null,
+            popup: null,
             featureInfoEnabled: false,
         };
     },
-
     mounted() {
         this.$nextTick(() => {
             this.popup = new Overlay({
@@ -121,7 +134,7 @@ export default {
         this.baseMaps = [bhuvan, bing, osm, ];
 
         const basinBoundary = new TileLayer({
-            name : 'Ganga Basin',
+            name: 'Ganga Basin',
             type: 'overlay',
             source: new TileWMS({
                 url: 'http://192.168.17.37:8080/geoserver/Geo-Ganga/wms?',
@@ -200,27 +213,62 @@ export default {
 
         const map = new Map({
             target: this.$refs.map,
-            layers: [...this.baseMaps, ...this.boundaries,...projectBoundary, ],
-            view: new View({projection: 'EPSG:4326',center: this.center,minZoom: 6.5,zoom: this.zoom,maxZoom: 19.4,extent: [68.1, 6.46, 97.4, 37.09]}),
+            layers: [...this.baseMaps, ...this.boundaries, ...projectBoundary, ],
+            view: new View({
+                projection: 'EPSG:4326',
+                center: this.center,
+                minZoom: 6.5,
+                zoom: this.zoom,
+                maxZoom: 19.4,
+                extent: [68.1, 6.46, 97.4, 37.09]
+            }),
         });
 
-        const mousePositionControl = new MousePosition({projection: 'EPSG:4326',coordinateFormat: createStringXY(4),target: document.getElementById('mouse-pos'),className: '',});
+        const mousePositionControl = new MousePosition({
+            projection: 'EPSG:4326',
+            coordinateFormat: createStringXY(4),
+            target: document.getElementById('mouse-pos'),
+            className: '',
+        });
         map.addControl(mousePositionControl);
 
-        const scaleControl = new ScaleLine({units: 'metric',bar: true,steps: 5,text: true,minWidth: 200,dpi: 96,target: 'scale-line',});
+        const scaleControl = new ScaleLine({
+            units: 'metric',
+            bar: true,
+            steps: 5,
+            text: true,
+            minWidth: 200,
+            dpi: 96,
+            target: 'scale-line',
+        });
         map.addControl(scaleControl);
 
-        const fullScreen = new FullScreen({tipLabel: 'Fullscreen',});
+        const fullScreen = new FullScreen({
+            tipLabel: 'Fullscreen',
+        });
         map.addControl(fullScreen);
 
         // Measurement Layer
         this.measurementSource = new VectorSource();
-        this.measurementLayer = new VectorLayer({source: this.measurementSource,style: {'fill-color': 'rgba(2, 42, 56, 0.2)','stroke-color': 'blue','stroke-width': 2,},});
+        this.measurementLayer = new VectorLayer({
+            source: this.measurementSource,
+            style: {
+                'fill-color': 'rgba(2, 42, 56, 0.2)',
+                'stroke-color': 'blue',
+                'stroke-width': 2,
+            },
+        });
         map.addLayer(this.measurementLayer);
 
         // Crop Layer
         this.cropSource = new VectorSource();
-        this.cropLayer = new VectorLayer({source: this.cropSource,style: {'stroke-color': 'blue','stroke-width': 2,}});
+        this.cropLayer = new VectorLayer({
+            source: this.cropSource,
+            style: {
+                'stroke-color': 'blue',
+                'stroke-width': 2,
+            }
+        });
         map.addLayer(this.cropLayer);
 
         this.map = map;
@@ -237,14 +285,24 @@ export default {
         this.map.on('singleclick', this.handleMapClick);
 
         // Listen to events from LeftSideBar
-        eventBus.on('toggle-layer-visibility', ({name,visible }) => { 
+        eventBus.on('toggle-layer-visibility', ({
+            name,
+            visible
+        }) => {
             const layer = this.layers[name];
-            if (layer) {layer.setVisible(visible);
-            } else { console.log(`"${name}" not found`);}
+            if (layer) {
+                layer.setVisible(visible);
+            } else {
+                console.log(`"${name}" not found`);
+            }
         });
-        eventBus.on('toggleFeatureInfo', (isEnabled) => {this.featureInfoEnabled = isEnabled;});
-        eventBus.on('hidePopup', () => {this.popupContent = null;this.popup.setPosition(undefined);});
-
+        eventBus.on('toggleFeatureInfo', (isEnabled) => {
+            this.featureInfoEnabled = isEnabled;
+        });
+        eventBus.on('hidePopup', () => {
+            this.popupContent = null;
+            this.popup.setPosition(undefined);
+        });
         // Listen to events from RightSideBar
         eventBus.on('set-measurement-mode', this.setMeasurementMode);
         eventBus.on('clear-measurements', this.deactivateMeasurement);
@@ -255,20 +313,18 @@ export default {
     },
 
     methods: {
-        switchBasemap(baseMapName) {
-      // Set the visibility of basemaps
-      this.baseMaps.forEach((layer) => {
-        layer.setVisible(layer.get('title').toLowerCase() === baseMapName.toLowerCase());
-      });
+        toggleBaseSwitcher() {
+            this.showBaseSwitcher = !this.showBaseSwitcher;
+        },
+        switchBaseMap(selectedBasemap) {
+            this.activeBaseMap = selectedBasemap;
+            this.baseMaps.forEach((layer) => {
+                const isVisible = layer.get("title") === selectedBasemap.name;
+                layer.setVisible(isVisible);
+            });
+            this.showBaseSwitcher = false;
+        },
 
-      // Update the current basemap icon
-      const selectedBasemap = this.basemaps.find(
-        (basemap) => basemap.name.toLowerCase() === baseMapName.toLowerCase()
-      );
-      if (selectedBasemap) {
-        this.currentBasemapIcon = selectedBasemap.icon;
-      }
-    },
         handleReset() {
             const view = this.map.getView();
             view.animate({
@@ -278,6 +334,7 @@ export default {
                 duration: 1000
             });
         },
+
         setMeasurementMode(mode) {
             this.deactivateMeasurement();
             this.measurementMode = mode;
@@ -516,23 +573,51 @@ export default {
 }
 
 .ol-popup {
-  position: absolute;
-  background: rgb(2, 42, 56);
-  color: wheat;
-  font-family: 'Poppins', sans-serif; 
-  font-weight:300; 
-  border: 1px solid #ddd;
-  padding: 15px 20px;
-  border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1); /* Soft, smooth shadow */
-  min-width: 300px;
-  max-height: 1200px;   
-  pointer-events: none;
+    position: absolute;
+    background: rgb(2, 42, 56);
+    color: wheat;
+    font-family: 'Poppins', sans-serif;
+    font-weight: 300;
+    border: 1px solid #ddd;
+    padding: 15px 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    /* Soft, smooth shadow */
+    min-width: 300px;
+    max-height: 1200px;
+    pointer-events: none;
 }
-.baseSwitcher{
-    position:absolute;
-    z-index: 2;
-    top: 8%;
-    right: .5%;
+
+.active-base {
+    cursor: pointer;
+    background: white;
+    border: 2px solid #000000;
+    border-radius: 10px;
+    width: 60px;
+    height: 60px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.active-icon,
+.base-icon {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.base-options {
+    position: absolute;
+    top: 0;
+    width: 180px;
+    height: 60px;
+    right: calc(100% + 10px);
+    background: white;
+    border: 2px solid #000000;
+    border-radius: 10px;
+    display: flex;
+    flex-direction: row;
+    gap: 5px;
 }
 </style>
