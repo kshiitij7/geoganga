@@ -113,23 +113,19 @@
             <!-- Compare Tool Content -->
             <div v-else-if="activeLeftTab === 'compare'">
                 <v-card elevation="0">
-                    <v-card-title>
-                        <div class="text-h5" style="font-family: 'Poppins', sans-serif; font-weight:500; text-align: center;">Comparison Tool</div>
-                    </v-card-title>
-                    <v-divider :thickness="2" color="black"></v-divider>
-                    <v-card-text>
-                        <v-title>
-                            <div class="text-h8 font-weight-bold">Left Side</div>
-                        </v-title>
-                        <v-select v-model="leftSelect" :items="leftMonths" label="Please Select a Layer"></v-select>
-                        <v-title>
-                            <div class="text-h8 font-weight-bold">Right Side</div>
-                        </v-title>
-                        <v-select v-model="rightSelect" :items="rightMonths" label="Please Select a Layer"></v-select>
-                        <v-btn :disabled="!isBothSelected || showError" @click="handleCompare">Compare</v-btn>
-                        <div v-if="showError" class="text-red text-caption mt-2">Please select different months.</div>
-                    </v-card-text>
-                </v-card>
+                <v-card-text>
+                    <v-title>
+                        <div class="text-h8 font-weight-bold">Left Side</div>
+                    </v-title>
+                    <v-select v-model="leftSelect" :items="months" label="Please Select a Layer" @change="validateSelection"></v-select>
+                    <v-title>
+                        <div class="text-h8 font-weight-bold">Right Side</div>
+                    </v-title>
+                    <v-select v-model="rightSelect" :items="months" label="Please Select a Layer" @change="validateSelection"></v-select>
+                    <v-btn  :disabled="!isBothSelected || showError" :color="comparisonStarted ? 'red' : 'green'" @click="toggleComparison">{{ comparisonStarted ? 'Disable Compare' : 'Compare' }} </v-btn>
+                    <div v-if="showError" style="font-size: 15px; color: red; margin-top: 20px;">Please Select Different Layers.</div>
+                </v-card-text>
+            </v-card>
                 <v-divider :thickness="3"></v-divider>
                 <v-img src="../assets/rightPng/compare_tool.png" style="margin-top: 80px; opacity: 0.9;" max-height="300" contain></v-img>
             </div>
@@ -150,8 +146,6 @@ export default {
             isLeftDrawerOpen: false,
             activeLeftTab: null,
             featureInfoEnabled: false,
-            leftSelect: null,
-            rightSelect: null,
             adminLayers: [
                             { name: 'India Boundary', visible: true },
                             { name: 'States', visible: false },
@@ -161,7 +155,10 @@ export default {
             projectLayers: [
                             { name: 'Ganga Basin', visible: true },
                         ],
-           
+            leftSelect: null,
+            rightSelect: null,
+            months: ["Evapotranspiration", "Precipitation"],
+            comparisonStarted: false, 
         };
     },
     computed: {
@@ -189,21 +186,30 @@ export default {
         onProjectBoundaryVisibilityChange(projectLayer) {
                 eventBus.emit('toggle-layer-visibility', {name: projectLayer.name,visible: projectLayer.visible,});
         },
-     toggleFeatureInfo() {
-        eventBus.emit('toggleFeatureInfo', this.featureInfoEnabled);
-        if (this.featureInfoEnabled) {
-          document.body.style.cursor = 'grab';  
-        } else {
-          document.body.style.cursor = 'auto'; 
-        }
+        toggleFeatureInfo() {
+            eventBus.emit('toggleFeatureInfo', this.featureInfoEnabled);
+            if (this.featureInfoEnabled) {
+                document.body.style.cursor = 'grab';  
+            } else {
+                document.body.style.cursor = 'auto'; 
+            }
         if (!this.featureInfoEnabled) {
         eventBus.emit('hidePopup');
-      }
-      },
-        handleCompare() {
-            if (!this.showError) {
-                alert('Comparison started!');
             }
+        },
+        validateSelection() {
+                this.showError = this.leftSelect === this.rightSelect;
+            },
+        toggleComparison() {
+                if (!this.comparisonStarted) {
+                    if (!this.showError) {
+                        this.comparisonStarted = true;
+                        eventBus.emit("compare-layers", {left: this.leftSelect,right: this.rightSelect,});
+                    }
+                } else {
+                    this.comparisonStarted = false;
+                    eventBus.emit("remove-comparison");
+                }
         },
     },
 };

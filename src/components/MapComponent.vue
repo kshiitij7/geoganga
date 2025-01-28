@@ -15,49 +15,33 @@
             </div>
         </div>
     </div>
+    <div v-if="leftLayerName" class="layer-label left-label">{{ rightLayerName }}</div>
+    <div v-if="rightLayerName" class="layer-label right-label">{{ leftLayerName }}</div>
 </div>
 </template>
 
 <script>
 import 'ol/ol.css';
-import {
-    Map
-} from 'ol';
+import {Map} from 'ol';
 import BingMaps from 'ol/source/BingMaps';
 import View from 'ol/View';
 import TileLayer from 'ol/layer/Tile';
 import OSM from 'ol/source/OSM';
 import 'ol-layerswitcher/dist/ol-layerswitcher.css';
 import TileWMS from 'ol/source/TileWMS';
-import {
-    get as getProjection
-} from 'ol/proj';
+import {get as getProjection} from 'ol/proj';
 import FullScreen from 'ol/control/FullScreen';
-import {
-    Draw
-} from 'ol/interaction';
-import {
-    Vector as VectorSource
-} from 'ol/source';
-import {
-    Vector as VectorLayer
-} from 'ol/layer';
-import {
-    ScaleLine
-} from 'ol/control.js';
-import {
-    getLength,
-    getArea
-} from 'ol/sphere';
+import {Draw} from 'ol/interaction';
+import {Vector as VectorSource} from 'ol/source';
+import {Vector as VectorLayer} from 'ol/layer';
+import {ScaleLine} from 'ol/control.js';
+import {getLength,getArea} from 'ol/sphere';
 import Overlay from 'ol/Overlay.js';
-import {
-    createBox
-} from 'ol/interaction/Draw';
+import {createBox} from 'ol/interaction/Draw';
 import MousePosition from 'ol/control/MousePosition.js';
-import {
-    createStringXY
-} from 'ol/coordinate.js';
+import {createStringXY} from 'ol/coordinate.js';
 import axios from 'axios';
+import Swipe from "ol-ext/control/Swipe";
 import eventBus from '@/event-bus';
 
 export default {
@@ -89,6 +73,9 @@ export default {
             popupContent: null,
             popup: null,
             featureInfoEnabled: false,
+            swipeControl: null, 
+            leftLayerName: "", 
+            rightLayerName: "" 
         };
     },
     mounted() {
@@ -163,6 +150,8 @@ export default {
             }),
             visible: true,
         });
+        const projectBoundary = [basinBoundary, indiaCountryBoundary, ];
+
         const StatesBoundary = new TileLayer({
             name: 'States',
             type: 'overlay',
@@ -209,19 +198,36 @@ export default {
             visible: false,
         });
         this.boundaries = [StatesBoundary, DistrictsBoundary, SubDistrictsBoundary];
-        const projectBoundary = [basinBoundary, indiaCountryBoundary, ];
+
+        const evapo = new TileLayer({
+            name: 'Evapotranspiration',
+            type: 'overlay',
+            source: new TileWMS({
+                url: 'http://192.168.17.37:8080/geoserver/Geo-Ganga/wms?',
+                params: {'LAYERS': 'EV_20240001','TILED': true,'VERSION': '1.1.1',},
+                serverType: 'geoserver',
+                tileGrid: new TileWMS().getTileGridForProjection(getProjection('EPSG:4326')),
+            }),
+            visible: false,
+        });
+
+        const preci = new TileLayer({
+            name: 'Precipitation',
+            type: 'overlay',
+            source: new TileWMS({
+                url: 'http://192.168.17.37:8080/geoserver/Geo-Ganga/wms?',
+                params: {'LAYERS': 'ERA5','TILED': true,'VERSION': '1.1.1',},
+                serverType: 'geoserver',
+                tileGrid: new TileWMS().getTileGridForProjection(getProjection('EPSG:4326')),
+            }),
+            visible: false,
+        });
+        this.rasterLayers = [evapo, preci];
 
         const map = new Map({
             target: this.$refs.map,
-            layers: [...this.baseMaps, ...this.boundaries, ...projectBoundary, ],
-            view: new View({
-                projection: 'EPSG:4326',
-                center: this.center,
-                minZoom: 6.5,
-                zoom: this.zoom,
-                maxZoom: 19.4,
-                extent: [68.1, 6.46, 97.4, 37.09]
-            }),
+            layers: [...this.baseMaps, ...this.boundaries, ...projectBoundary, ...this.rasterLayers  ],
+            view: new View({projection: 'EPSG:4326',center: this.center,minZoom: 6.5,zoom: this.zoom,maxZoom: 19.4,extent: [68.1, 6.46, 97.4, 37.09] }),
         });
 
         const mousePositionControl = new MousePosition({
@@ -303,6 +309,9 @@ export default {
             this.popupContent = null;
             this.popup.setPosition(undefined);
         });
+        eventBus.on("compare-layers", this.enableSwipeComparison);
+        eventBus.on("remove-comparison", this.resetLayers);
+
         // Listen to events from RightSideBar
         eventBus.on('set-measurement-mode', this.setMeasurementMode);
         eventBus.on('clear-measurements', this.deactivateMeasurement);
@@ -536,88 +545,45 @@ export default {
                 this.popupContent = null; // Clear content
             }
         },
+        enableSwipeComparison({ left, right }) {
+            const leftLayer = this.rasterLayers.find((layer) => layer.get("name") === right);
+            const rightLayer = this.rasterLayers.find((layer) => layer.get("name") === left);
+            if (leftLayer && rightLayer) {
+                leftLayer.setVisible(true);
+                rightLayer.setVisible(true);
+                this.swipeControl = new Swipe();
+                this.map.addControl(this.swipeControl);
+                this.swipeControl.addLayer(leftLayer, true); 
+                this.swipeControl.addLayer(rightLayer, false); 
+                this.leftLayerName = leftLayer.get("name");
+                this.rightLayerName = rightLayer.get("name");
+            }
+        },
+        resetLayers() {
+            this.rasterLayers.forEach((layer) => {layer.setVisible(false);});
+            if (this.swipeControl) {
+                this.swipeControl.removeLayers();
+                this.leftLayerName = "";
+                this.rightLayerName = "";
+                this.map.removeControl(this.swipeControl);
+                this.swipeControl = null; 
+            }
+        },
     },
     beforeUnmount() {
         eventBus.off('search-query', this.handleSearchQuery);
         eventBus.off('set-measurement-mode', this.setMeasurementMode);
         eventBus.off('clear-measurements', this.deactivateMeasurement);
+        eventBus.off("compare-layers", this.updateLayerVisibility);
+        eventBus.off("remove-comparison", this.resetLayers);
     },
 };
 </script>
 
-<style scoped>
-.resetButton {
-    top: 1%;
-    right: 2.5%;
-    position: absolute;
-    padding: 0;
-    color: var(--ol-subtle-foreground-color);
-    font-weight: bold;
-    text-decoration: none;
-    font-size: inherit;
-    text-align: center;
-    height: 1.45em;
-    width: 1.45em;
-    line-height: .4em;
-    background-color: var(--ol-background-color);
-    border: none;
-    border-radius: 2px;
-    z-index: 1000;
-}
+<style scoped src="@/components/MapStyles.css">
 
-.resetButton:hover,
-.resetButton:focus {
-    text-decoration: none;
-    outline: 1px solid var(--ol-subtle-foreground-color);
-    color: var(--ol-foreground-color);
-}
+</style>
 
-.ol-popup {
-    position: absolute;
-    background: rgb(2, 42, 56);
-    color: wheat;
-    font-family: 'Poppins', sans-serif;
-    font-weight: 300;
-    border: 1px solid #ddd;
-    padding: 15px 20px;
-    border-radius: 8px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-    /* Soft, smooth shadow */
-    min-width: 300px;
-    max-height: 1200px;
-    pointer-events: none;
-}
+<style scoped src="@/components/customSwipe.css">
 
-.active-base {
-    cursor: pointer;
-    background: white;
-    border: 2px solid #000000;
-    border-radius: 10px;
-    width: 60px;
-    height: 60px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-
-.active-icon,
-.base-icon {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-}
-
-.base-options {
-    position: absolute;
-    top: 0;
-    width: 180px;
-    height: 60px;
-    right: calc(100% + 10px);
-    background: white;
-    border: 2px solid #000000;
-    border-radius: 10px;
-    display: flex;
-    flex-direction: row;
-    gap: 5px;
-}
 </style>
