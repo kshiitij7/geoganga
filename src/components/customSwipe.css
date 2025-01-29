@@ -8,11 +8,11 @@
   }
   
   :deep(.ol-swipe button) {
-    width: 15px;
-    height: 50px;
-    background: linear-gradient(135deg, #4a90e2, #9013fe);
-    border: none;
-    border-radius: 12px;
+    width: 25px;
+    height: 25px;
+    background: white; 
+    border: solid .5px black;
+    border-radius: 50%; /* Makes it a circle */
     display: flex;
     justify-content: center;
     align-items: center;
@@ -20,25 +20,19 @@
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2), 0 1px 3px rgba(0, 0, 0, 0.1);
     cursor: pointer;
     transition: transform 0.2s ease, box-shadow 0.2s ease;
-  }
+}
   
-  :deep(.ol-swipe button:hover) {
-    transform: scale(1.1);
-    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3), 0 3px 6px rgba(0, 0, 0, 0.2);
-  }
-  
-  :deep(.ol-swipe button::before) {
-    position: absolute;
-    font-size: 20px;
-    color: white;
-    left: 10px;
-  }
+:deep(.ol-swipe button:hover) {
+  transform: scale(1.1);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+}
   
   :deep(.ol-swipe button::after) {
+    content: "↔"; 
     position: absolute;
-    font-size: 20px;
-    color: white;
-    right: 10px;
+    font-size: 35px;
+    color: black;   
+    bottom: 15px;
   }
   
   :deep(.ol-swipe:before) {
