@@ -2,7 +2,7 @@
   <v-app>
 
     <HeaderMain/>
-    <NavBarMain/>
+    <!-- <NavBarMain/> -->
     
     <router-view/>
   
@@ -12,13 +12,13 @@
 <script>
 
 import HeaderMain from './Layouts/HeaderMain.vue';
-import NavBarMain from './Layouts/NavBarMain.vue';
+// import NavBarMain from './Layouts/NavBarMain.vue';
 
 export default {
   name: 'App',
   components:{
     HeaderMain,
-    NavBarMain,
+    // NavBarMain,
   },
 
   data: () => ({
