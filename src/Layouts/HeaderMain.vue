@@ -11,7 +11,7 @@
       <!-- Header Text -->
       <div ref="headerText" class="header-text">
         <h3>भारतीय अंतरिक्ष अनुसंधान संगठन, अंतरिक्ष विभाग</h3>
-        <!-- <h3>Indian Space Research Organisation, Department of Space</h3> -->
+        <h3>Indian Space Research Organisation, Department of Space</h3>
         <h3>भारत सरकार / Government of India</h3>
       </div>
   
