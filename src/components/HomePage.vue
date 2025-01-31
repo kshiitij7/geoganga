@@ -1,13 +1,14 @@
 <template>
-    <v-main>
-      <div class="image-container">      
-        <v-img :src="homeImage" />
-        <div class="overlay-text animate-text">
-          Geo-Ganga Portal
-        </div>
-      </div>
-      <AboutCards />
-    </v-main>
+<v-main>
+  <div class="image-container">
+    <v-img :src="homeImage" class="image" />
+
+    <AboutCards class="overlay-card"/>
+    <div class="overlay-text animate-text">
+      Geo-Ganga
+    </div>
+  </div>
+</v-main>
   
     <FooterHome />
   </template>
@@ -15,13 +16,14 @@
 
 <script>
 import FooterHome from '@/Layouts/FooterHome.vue';
- import AboutCards from './AboutCards.vue';
+import AboutCards from './AboutCards.vue';
+  
 
 export default {
     name: 'HomePage',
     components: {
         FooterHome,
-       AboutCards,
+        AboutCards,
     },
     data() {
         return {
@@ -42,14 +44,20 @@ export default {
     transform: translate(-50%, -50%);
   }
 }
-
+.overlay-card {
+  position: absolute;
+  width: 100%;
+  top: 78%;
+  left: 90%;
+  transform: translate(-50%, -50%);
+}
 .overlay-text {
     width: 100%;
   position: absolute;
-  top: 10%;
-  left: 50%;
+  top: 20%;
+  left: 70%;
   transform: translate(-50%, -50%);
-  font-size: 100px;
+  font-size: 130px;
   font-weight: bold;
   text-align: center;
   font-family: "Poppins", sans-serif;
