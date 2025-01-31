@@ -580,5 +580,5 @@ export default {
 };
 </script>
 
-<style scoped src="@/components/MapStyles.css"></style>
-<style scoped src="@/components/customSwipe.css"></style>
+<style scoped src="@/styles/MapStyles.css"></style>
+<style scoped src="@/styles/customSwipe.css"></style>
