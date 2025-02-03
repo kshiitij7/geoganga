@@ -124,7 +124,7 @@ export default {
             name: 'Ganga Basin',
             type: 'overlay',
             source: new TileWMS({
-                url: 'http://192.168.17.37:8080/geoserver/Geo-Ganga/wms?',
+                url: 'http://172.16.30.160:8080/geoserver/Geo-Ganga/wms?',
                 params: {
                     'LAYERS': 'Ganga_Basin_v4',
                     'TILED': true,
@@ -139,7 +139,7 @@ export default {
             name: 'India',
             type: 'overlay',
             source: new TileWMS({
-                url: 'http://192.168.17.37:8080/geoserver/Geo-Ganga/wms?',
+                url: 'http://172.16.30.160:8080/geoserver/Geo-Ganga/wms?',
                 params: {
                     'LAYERS': 'india_country_boundary_4326',
                     'TILED': true,
@@ -150,15 +150,15 @@ export default {
             }),
             visible: true,
         });
-        const projectBoundary = [basinBoundary, indiaCountryBoundary, ];
+        const projectBoundary = [indiaCountryBoundary,basinBoundary,  ];
 
         const StatesBoundary = new TileLayer({
             name: 'States',
             type: 'overlay',
             source: new TileWMS({
-                url: 'http://192.168.17.37:8080/geoserver/Geo-Ganga/wms?',
+                url: 'http://172.16.30.160:8080/geoserver/Geo-Ganga/wms?',
                 params: {
-                    'LAYERS': 'states_boundary_ganga',
+                    'LAYERS': 'STATE_TOUCH',
                     'TILED': true,
                     'VERSION': '1.1.1',
                 },
@@ -171,7 +171,7 @@ export default {
             name: 'Districts ',
             type: 'overlay',
             source: new TileWMS({
-                url: 'http://192.168.17.37:8080/geoserver/Geo-Ganga/wms?',
+                url: 'http://172.16.30.160:8080/geoserver/Geo-Ganga/wms?',
                 params: {
                     'LAYERS': 'district_touch',
                     'TILED': true,
@@ -186,7 +186,7 @@ export default {
             name: 'Sub-Districts',
             type: 'overlay',
             source: new TileWMS({
-                url: 'http://192.168.17.37:8080/geoserver/Geo-Ganga/wms?',
+                url: 'http://172.16.30.160:8080/geoserver/Geo-Ganga/wms?',
                 params: {
                     'LAYERS': 'subdistrict_touch',
                     'TILED': true,
@@ -227,7 +227,7 @@ export default {
         const map = new Map({
             target: this.$refs.map,
             layers: [...this.baseMaps, ...this.boundaries, ...projectBoundary, ...this.rasterLayers  ],
-            view: new View({projection: 'EPSG:4326',center: this.center,minZoom: 6.5,zoom: this.zoom,maxZoom: 19.4,extent: [68.1, 6.46, 97.4, 37.09] }),
+            view: new View({projection: 'EPSG:4326',center: this.center,minZoom: 6.5,zoom: this.zoom,maxZoom: 19.4,extent: [66.1, 4.46, 99.4, 39.09]}),
         });
 
         const mousePositionControl = new MousePosition({

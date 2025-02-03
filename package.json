@@ -1,5 +1,5 @@
 {
-  "name": "Geo-Ganga",
+  "name": "geo-ganga",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -10,12 +10,16 @@
   "dependencies": {
     "@mdi/font": "5.9.55",
     "core-js": "^3.8.3",
+    "express": "^4.21.2",
+    "fs": "^0.0.1-security",
     "gsap": "^3.12.7",
+    "https": "^1.0.0",
     "mitt": "^3.0.1",
     "ol": "^10.3.1",
     "ol-ext": "^4.0.25",
     "ol-layerswitcher": "^4.1.2",
     "olcs": "^2.22.1",
+    "path": "^0.12.7",
     "roboto-fontface": "*",
     "vue": "^3.2.13",
     "vue-cli-service": "^5.0.10",
@@ -56,5 +60,18 @@
     "last 2 versions",
     "not dead",
     "not ie 11"
-  ]
+  ],
+  "description": "## Project setup ``` npm install ```",
+  "main": "babel.config.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kshiitij7/geoganga.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/kshiitij7/geoganga/issues"
+  },
+  "homepage": "https://github.com/kshiitij7/geoganga#readme"
 }
